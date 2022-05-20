@@ -5,18 +5,17 @@ import {
   UALError, UALErrorType, User
 } from 'universal-authenticator-library'
 import { Name } from './interfaces'
-import { scatterLogo } from './scatterLogo'
-import { ScatterUser } from './ScatterUser'
-import { UALScatterError } from './UALScatterError'
+import { wombatLogo } from './wombatLogo'
+import { WombatUser } from './WombatUser'
+import { UALWombatError } from './UALWombatError'
 
 declare let window: any
 
-export class Scatter extends Authenticator {
-  private users: ScatterUser[] = []
+export class Wombat extends Authenticator {
+  private users: WombatUser[] = []
   private scatter: any
   private appName: string
   private scatterIsLoading: boolean = false
-  private initError: UALError | null = null
 
   /**
    * Scatter Constructor.
@@ -29,7 +28,7 @@ export class Scatter extends Authenticator {
     if (options && options.appName) {
       this.appName = options.appName
     } else {
-      throw new UALScatterError('Scatter requires the appName property to be set on the `options` argument.',
+      throw new UALWombatError('Scatter requires the appName property to be set on the `options` argument.',
         UALErrorType.Initialization,
         null)
     }
@@ -45,10 +44,6 @@ export class Scatter extends Authenticator {
 
     // set an errored state if scatter doesn't connect
     if (!await ScatterJS.scatter.connect(this.appName)) {
-      this.initError = new UALScatterError('Error occurred while connecting',
-        UALErrorType.Initialization,
-        null
-      )
 
       this.scatterIsLoading = false
 
@@ -62,7 +57,6 @@ export class Scatter extends Authenticator {
   }
 
   public reset(): void {
-    this.initError = null
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.init()
   }
@@ -72,19 +66,19 @@ export class Scatter extends Authenticator {
   }
 
   public isErrored(): boolean {
-    return !!this.initError
+    return false
   }
 
   public getError(): UALError | null {
-    return this.initError
+    return null
   }
 
   public getStyle(): ButtonStyle {
     return {
-      icon: scatterLogo,
+      icon: wombatLogo,
       text: Name,
       textColor: 'white',
-      background: '#078CE9'
+      background: '#f43e27'
     }
   }
 
@@ -92,10 +86,7 @@ export class Scatter extends Authenticator {
    * Scatter will only render on Desktop Browser Environments
    */
   public shouldRender(): boolean {
-    if (!this.isMobile()) {
-      return true
-    }
-    return false
+    return true
   }
 
   public shouldAutoLogin(): boolean {
@@ -107,14 +98,15 @@ export class Scatter extends Authenticator {
 
     try {
       for (const chain of this.chains) {
-        const user = new ScatterUser(chain, this.scatter)
+        const user = new WombatUser(chain, this.scatter)
         await user.getKeys()
         this.users.push(user)
       }
 
       return this.users
     } catch (e) {
-      throw new UALScatterError(
+      window.open('https://getwombat.io')
+      throw new UALWombatError(
         'Unable to login',
         UALErrorType.Login,
         e)
@@ -128,7 +120,7 @@ export class Scatter extends Authenticator {
     try {
       this.scatter.logout()
     } catch (error) {
-      throw new UALScatterError('Error occurred during logout',
+      throw new UALWombatError('Error occurred during logout',
         UALErrorType.Logout,
         error)
     }
@@ -152,7 +144,7 @@ export class Scatter extends Authenticator {
   }
 
   public getOnboardingLink(): string {
-    return 'https://get-scatter.com/'
+    return 'https://getwombat.io/'
   }
 
   public requiresGetKeyConfirmation(): boolean {
