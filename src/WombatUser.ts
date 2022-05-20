@@ -2,12 +2,12 @@ import { Api, JsonRpc, Numeric } from 'eosjs'
 import { ec as EC } from 'elliptic'
 import { Signature, PublicKey } from 'eosjs/dist/eosjs-jssig'
 import { Chain, SignTransactionResponse, UALErrorType, User } from 'universal-authenticator-library'
-import { UALScatterError } from './UALScatterError'
+import { UALWombatError } from './UALWombatError'
 
 const { KeyType } = Numeric
 const ec = new EC('secp256k1')
 
-export class ScatterUser extends User {
+export class WombatUser extends User {
   private api: Api
   private rpc: JsonRpc
 
@@ -45,7 +45,7 @@ export class ScatterUser extends User {
 
       return this.returnEosjsTransaction(broadcast, completedTransaction)
     } catch (e) {
-      throw new UALScatterError(
+      throw new UALWombatError(
         'Unable to sign the given transaction',
         UALErrorType.Signing,
         e)
@@ -101,7 +101,7 @@ export class ScatterUser extends User {
       this.keys = [identity.accounts[0].publicKey]
       this.accountName = identity.accounts[0].name
     } catch (e) {
-      throw new UALScatterError(
+      throw new UALWombatError(
         'Unable load user\'s identity',
         UALErrorType.DataRequest,
         e)

@@ -1,2 +1,2 @@
-export * from './Scatter'
-export * from './ScatterUser'
+export * from './Wombat'
+export * from './WombatUser'

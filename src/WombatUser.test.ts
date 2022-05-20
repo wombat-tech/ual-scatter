@@ -1,6 +1,6 @@
 import { ec as EC } from 'elliptic'
 import { Chain, RpcEndpoint, UALError, UALErrorType } from 'universal-authenticator-library'
-import { ScatterUser } from './ScatterUser'
+import { WombatUser } from './WombatUser'
 import { Signature, PrivateKey } from 'eosjs/dist/eosjs-jssig'
 import { Numeric } from 'eosjs'
 
@@ -36,11 +36,11 @@ const privateKeys = [
 const signatureValue = 'SIG_K1_HKkqi3zray76i63ZQwAHWMjoLk3wTa1ajZWPcUnrhgmSWQYEHDJsxkny6VDTWEmVdfktxpGoTA81qe6QuCrDmazeQndmxh'
 const publicKeys = ['PUB_K1_7tgwU6E7pAUQJgqEJt66Yi8cWvanTUW8ZfBjeXeJBQvhYTBFvY', 'PUB_K1_8aBcRwL2xrEGQNShB6SyUszUxATXZFDyEza4vGypUJtHBdNeDa']
 
-describe('ScatterUser', () => {
+describe('WombatUser', () => {
   let user
 
   beforeEach(() => {
-    user = new ScatterUser(chain, scatter)
+    user = new WombatUser(chain, scatter)
   })
 
   describe('getAccountName', () => {
@@ -55,7 +55,7 @@ describe('ScatterUser', () => {
         const ex = e as UALError
         expect(scatter.getIdentity).toBeCalled()
         expect(ex.message).toEqual('Unable load user\'s identity')
-        expect(ex.source).toEqual('Scatter')
+        expect(ex.source).toEqual('Wombat')
         expect(ex.type).toEqual(UALErrorType.DataRequest)
         expect(ex.cause).toEqual(new Error('Error in getIdentity'))
       }
@@ -92,7 +92,7 @@ describe('ScatterUser', () => {
         await user.signTransaction({}, {})
       } catch (e) {
         const ex = e as UALError
-        expect(ex.source).toEqual('Scatter')
+        expect(ex.source).toEqual('Wombat')
         expect(ex.type).toEqual(UALErrorType.Signing)
         expect(ex.cause).not.toBeNull()
       }

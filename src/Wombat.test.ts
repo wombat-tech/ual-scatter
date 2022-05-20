@@ -1,8 +1,8 @@
 import { Chain, RpcEndpoint, UALErrorType } from 'universal-authenticator-library'
 import ScatterJS from '@scatterjs/core'
 import { Name } from './interfaces'
-import { Scatter } from './Scatter'
-import { UALScatterError } from './UALScatterError'
+import { Wombat } from './Wombat'
+import { UALWombatError } from './UALWombatError'
 
 declare var window: any
 
@@ -36,7 +36,7 @@ Object.defineProperty(window.navigator, 'userAgent', ((_value) => {
   }
 })(window.navigator.userAgent))
 
-describe('Scatter', () => {
+describe('Wombat', () => {
   let api: any
   let scatter: any
 
@@ -47,32 +47,15 @@ describe('Scatter', () => {
       connect: jest.fn().mockImplementation(() => true),
       getIdentity: null,
     }
+    window.open = jest.fn()
   })
 
   describe('shouldRender', () => {
-    it('returns true in tests (because its not mobile)', async () => {
+    it('returns true in tests', async () => {
       ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
 
       expect(scatterAuth.shouldRender()).toBe(true)
-    })
-
-    it('returns false if it is on mobile', async () => {
-      ScatterJS.scatter = scatter
-
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
-      scatterAuth.isMobile = () => true
-
-      expect(scatterAuth.shouldRender()).toBe(false)
-    })
-
-    it('returns false if it is within an embedded browser', () => {
-      ScatterJS.scatter = scatter
-
-      window.navigator.userAgent = 'EOSLynx Ios'
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
-
-      expect(scatterAuth.shouldRender()).toBe(false)
     })
   })
 
@@ -83,7 +66,7 @@ describe('Scatter', () => {
       scatter.logout = jest.fn().mockImplementation(() => { throw new Error('Error in logout') })
       ScatterJS.scatter = scatter
 
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
       await scatterAuth.init()
 
       let didThrow = true
@@ -92,7 +75,7 @@ describe('Scatter', () => {
         await scatterAuth.logout()
         didThrow = false
       } catch (e) {
-        const ex = e as UALScatterError
+        const ex = e as UALWombatError
         expect(scatter.connect).toBeCalled()
         expect(ex.source).toEqual(Name)
         expect(ex.type).toEqual(UALErrorType.Logout)
@@ -109,7 +92,7 @@ describe('Scatter', () => {
       scatter.getIdentity = jest.fn().mockImplementation(async () => identity)
       ScatterJS.scatter = scatter
 
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
       await scatterAuth.init()
 
       const users = await scatterAuth.login()
@@ -122,7 +105,7 @@ describe('Scatter', () => {
       scatter.getIdentity = jest.fn().mockImplementation(async () => identity)
       ScatterJS.scatter = scatter
 
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
       await scatterAuth.init()
 
       await scatterAuth.login()
@@ -135,7 +118,7 @@ describe('Scatter', () => {
       scatter.getIdentity = jest.fn().mockImplementation(async () => { throw new Error('Error in getIdentity') })
       ScatterJS.scatter = scatter
 
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
+      const scatterAuth = new Wombat([chain], { appName: 'testdapp' })
       await scatterAuth.init()
 
       let didThrow = true
@@ -144,7 +127,7 @@ describe('Scatter', () => {
         await scatterAuth.login()
         didThrow = false
       } catch (e) {
-        const ex = e as UALScatterError
+        const ex = e as UALWombatError
         expect(scatter.getIdentity).toBeCalled()
         expect(ex.source).toEqual(Name)
         expect(ex.type).toEqual(UALErrorType.Login)
@@ -158,7 +141,7 @@ describe('Scatter', () => {
   describe('isLoading', () => {
     it('is false when authenticator is not initialized', () => {
       ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
 
       expect(scatterAuth.isLoading()).toBe(false)
     })
@@ -169,7 +152,7 @@ describe('Scatter', () => {
       }
 
       ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
+      const scatterAuth = new Wombat([chain], { appName: 'testdapp' })
       scatterAuth.init()
 
       expect(scatterAuth.isLoading()).toBe(true)
@@ -179,7 +162,7 @@ describe('Scatter', () => {
       ScatterJS.scatter = scatter
 
       ScatterJS.scatter.connect = jest.fn().mockImplementation()
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
+      const scatterAuth = new Wombat([chain], { appName: 'testdapp' })
       await scatterAuth.init()
 
       expect(scatterAuth.isLoading()).toBe(false)
@@ -189,39 +172,15 @@ describe('Scatter', () => {
   describe('init errored', () => {
     it('not when no error is set', async () => {
       ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
+      const scatterAuth = new Wombat([chain], { appName: 'testdapp' })
       await scatterAuth.init()
 
       expect(scatterAuth.isErrored()).toBe(false)
     })
 
-    it('errored when scatter init fails', async () => {
-      scatter.connect = () => {
-        return Promise.resolve(false)
-      }
-
-      ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
-      await scatterAuth.init()
-
-      expect(scatterAuth.isErrored()).toBe(true)
-    })
-
-    it('sets error', async () => {
-      scatter.connect = () => {
-        return Promise.resolve(false)
-      }
-
-      ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
-      await scatterAuth.init()
-
-      expect(scatterAuth.getError()).not.toBe(null)
-    })
-
     it('does not set when none exists', async () => {
       ScatterJS.scatter = scatter
-      const scatterAuth = new Scatter([chain], { appName: 'testdapp' })
+      const scatterAuth = new Wombat([chain], { appName: 'testdapp' })
       await scatterAuth.init()
 
       expect(scatterAuth.getError()).toBe(null)
@@ -230,7 +189,7 @@ describe('Scatter', () => {
 
   describe('get authenticator name', () => {
     it('should be able to get authenticator name', () => {
-      const scatterAuth = new Scatter(chains, { appName: 'testdapp' })
+      const scatterAuth = new Wombat(chains, { appName: 'testdapp' })
       expect(scatterAuth.getName()).toBe(Name)
     })
   })
