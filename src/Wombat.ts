@@ -43,7 +43,8 @@ export class Wombat extends Authenticator {
     ScatterJS.plugins(new ScatterEOS())
 
     // set an errored state if scatter doesn't connect
-    if (!await ScatterJS.scatter.connect(this.appName)) {
+    // eslint-disable-next-line no-underscore-dangle
+    if ((!window.scatter) || !await ScatterJS.scatter.connect(this.appName)) {
 
       this.scatterIsLoading = false
 
