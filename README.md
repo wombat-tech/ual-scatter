@@ -1,11 +1,6 @@
 # UAL for Wombat Authenticator
 
-This authenticator is meant to be used with [Scatter](https://get-scatter.com/) and [Universal Authenticator Library](https://github.com/EOSIO/universal-authenticator-library). When used in combination with them, it gives developers the ability to request transaction signatures through Scatter using the common UAL API.
-
-![EOSIO Labs](https://img.shields.io/badge/EOSIO-Labs-5cb3ff.svg)
-
-## Supported Environments
-- The Wombat Authenticator only supports Desktop Browser Environments
+This authenticator is meant to be used with [Wombat](https://getwombat.io/) and [Universal Authenticator Library](https://github.com/EOSIO/universal-authenticator-library). When used in combination with them, it gives developers the ability to request transaction signatures through Wombat using the common UAL API.
 
 ## Getting Started
 
