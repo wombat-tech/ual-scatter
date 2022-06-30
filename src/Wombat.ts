@@ -1,5 +1,3 @@
-import ScatterJS from '@scatterjs/core'
-import ScatterEOS from '@scatterjs/eosjs2'
 import {
   Authenticator, ButtonStyle, Chain,
   UALError, UALErrorType, User
@@ -40,20 +38,17 @@ export class Wombat extends Authenticator {
    */
   public async init(): Promise<void> {
     this.scatterIsLoading = true
-    ScatterJS.plugins(new ScatterEOS())
 
     // set an errored state if scatter doesn't connect
-    // eslint-disable-next-line no-underscore-dangle
-    if ((!window.scatter) || !await ScatterJS.scatter.connect(this.appName)) {
-
+    if (!window.scatter) {
       this.scatterIsLoading = false
 
       return
     }
 
-    this.scatter = ScatterJS.scatter
-    window.ScatterJS = null
+    await window.scatter.connect(this.appName)
 
+    this.scatter = window.scatter
     this.scatterIsLoading = false
   }
 
