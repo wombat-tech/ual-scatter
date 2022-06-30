@@ -20,21 +20,6 @@ const chain: Chain = {
 
 const chains = [chain]
 
-// const account: any = {
-//   publicKey: 'EOS11111',
-//   name: 'test.account',
-// }
-
-// Make userAgent mutable for testing
-Object.defineProperty(window.navigator, 'userAgent', ((_value) => {
-  return {
-    get: () => _value,
-    set: (v) => {
-      _value = v
-    }
-  }
-})(window.navigator.userAgent))
-
 describe('Wombat', () => {
   let api: any
   let scatter: any
