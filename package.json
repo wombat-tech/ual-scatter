@@ -4,14 +4,12 @@
   "main": "dist/index.js",
   "license": "MIT",
   "author": {
-    "name": "Block.one",
-    "url": "https://block.one"
+    "name": "Spielworks GmbH",
+    "url": "https://www.wombat.app/"
   },
   "contributors": [
-    "Nasser Abouelazm",
-    "Chris Allnutt",
-    "Randy Torres",
-    "Jeffrey Smith II"
+    "Jan Schmutz",
+    "Moritz do Rio Schulze"
   ],
   "scripts": {
     "build": "rm -rf dist && tsc --build tsconfig.json",
