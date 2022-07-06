@@ -1,4 +1,0 @@
-{
-  "extends": "@blockone/blockone",
-  "ignorePatterns": ["src/**/*.test.ts"]
-}

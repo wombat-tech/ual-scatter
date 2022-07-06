@@ -1,5 +1,3 @@
-import ScatterJS from '@scatterjs/core'
-import ScatterEOS from '@scatterjs/eosjs2'
 import {
   Authenticator, ButtonStyle, Chain,
   UALError, UALErrorType, User
@@ -14,7 +12,8 @@ declare let window: any
 export class Wombat extends Authenticator {
   private users: WombatUser[] = []
   private scatter: any
-  private appName: string
+  private readonly appName: string
+  private error: UALWombatError | null = null
   private scatterIsLoading: boolean = false
 
   /**
@@ -40,26 +39,32 @@ export class Wombat extends Authenticator {
    */
   public async init(): Promise<void> {
     this.scatterIsLoading = true
-    ScatterJS.plugins(new ScatterEOS())
+    this.error = null
 
     // set an errored state if scatter doesn't connect
-    // eslint-disable-next-line no-underscore-dangle
-    if ((!window.scatter) || !await ScatterJS.scatter.connect(this.appName)) {
-
+    if (!window.scatter) {
       this.scatterIsLoading = false
-
+      this.error = new UALWombatError('Wombat wallet not found', UALErrorType.Initialization, null)
       return
     }
 
-    this.scatter = ScatterJS.scatter
-    window.ScatterJS = null
+    try {
+      await window.scatter.connect(this.appName)
+    } catch (e) {
+      this.error = new UALWombatError('Could not connect to Wombat wallet', UALErrorType.Initialization, e)
+      return
+    }
 
+    this.scatter = window.scatter
     this.scatterIsLoading = false
   }
 
   public reset(): void {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.init()
+    this.error = null
+    this.scatterIsLoading = false
+    this.users = []
+    this.scatter = undefined
+    this.init().catch(error => console.error('Error resetting Wombat UAL', error))
   }
 
   public isLoading(): boolean {
@@ -67,11 +72,11 @@ export class Wombat extends Authenticator {
   }
 
   public isErrored(): boolean {
-    return false
+    return this.error !== null
   }
 
   public getError(): UALError | null {
-    return null
+    return this.error
   }
 
   public getStyle(): ButtonStyle {
@@ -83,9 +88,6 @@ export class Wombat extends Authenticator {
     }
   }
 
-  /**
-   * Scatter will only render on Desktop Browser Environments
-   */
   public shouldRender(): boolean {
     return true
   }
@@ -106,11 +108,8 @@ export class Wombat extends Authenticator {
 
       return this.users
     } catch (e) {
-      window.open('https://getwombat.io')
-      throw new UALWombatError(
-        'Unable to login',
-        UALErrorType.Login,
-        e)
+      window.open('https://www.wombat.app/')
+      throw new UALWombatError('Unable to login', UALErrorType.Login, e)
     }
   }
 
@@ -120,10 +119,8 @@ export class Wombat extends Authenticator {
   public async logout(): Promise<void> {
     try {
       this.scatter.logout()
-    } catch (error) {
-      throw new UALWombatError('Error occurred during logout',
-        UALErrorType.Logout,
-        error)
+    } catch (e) {
+      throw new UALWombatError('Error occurred during logout', UALErrorType.Logout, e)
     }
   }
 
@@ -134,18 +131,8 @@ export class Wombat extends Authenticator {
     return false
   }
 
-  public isMobile(): boolean {
-    const userAgent = window.navigator.userAgent
-    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad')
-    const isMobile = userAgent.includes('Mobile')
-    const isAndroid = userAgent.includes('Android')
-    const isCustom = userAgent.toLowerCase().includes('eoslynx')
-
-    return isIOS || isMobile || isAndroid || isCustom
-  }
-
   public getOnboardingLink(): string {
-    return 'https://getwombat.io/'
+    return 'https://www.wombat.app/'
   }
 
   public requiresGetKeyConfirmation(): boolean {
