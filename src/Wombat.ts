@@ -72,7 +72,7 @@ export class Wombat extends Authenticator {
   }
 
   public isErrored(): boolean {
-    return this.error !== null
+    return this.error !== null && this.error.type !== UALErrorType.Initialization
   }
 
   public getError(): UALError | null {
@@ -108,7 +108,8 @@ export class Wombat extends Authenticator {
 
       return this.users
     } catch (e) {
-      window.open('https://www.wombat.app/')
+      const origin = window.location.href
+      window.open('https://app.getwombat.io/dapp-view?url=' + origin)
       throw new UALWombatError('Unable to login', UALErrorType.Login, e)
     }
   }
