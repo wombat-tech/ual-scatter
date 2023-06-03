@@ -46,7 +46,7 @@ export class WombatUser extends User {
       return this.returnEosjsTransaction(broadcast, completedTransaction)
     } catch (e) {
       throw new UALWombatError(
-        'Unable to sign the given transaction',
+        e.message || 'Unable to sign the given transaction',
         UALErrorType.Signing,
         e)
     }
